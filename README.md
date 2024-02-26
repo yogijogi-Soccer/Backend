@@ -1,1 +1,3 @@
 # Backend
+JDK 11
+SPRINGBOOT 3.2.3
