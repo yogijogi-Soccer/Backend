@@ -1,4 +1,8 @@
 # Backend
 JDK 11 
-
-SPRINGBOOT 3.2.3
+SpringBoot 3.2.3
+Maria DB
+JPA
+JWT
+SPRING SECURITY
+OAUTH
