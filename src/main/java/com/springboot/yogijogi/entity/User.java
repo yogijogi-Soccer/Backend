@@ -45,7 +45,7 @@ public class User implements UserDetails {
     private String phoneNum;
 
     @Column(nullable = false)
-    private Long certification_num;   // 인증번호
+    private String certification_num;   // 인증번호
 
     @Column(nullable = true)
     private boolean has_experience;  // 선수경험
@@ -59,10 +59,10 @@ public class User implements UserDetails {
     private List<String> available_days ;   //가능 요일
 
     @Column(nullable = true)
-    private LocalTime available_time_start;  // 시작 시간
+    private String available_time_start;  // 시작 시간
 
     @Column(nullable = true)
-    private LocalTime  available_time_end;  // 종료 시간
+    private String  available_time_end;  // 종료 시간
 
 
 
@@ -71,6 +71,27 @@ public class User implements UserDetails {
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
+
+    @Column(nullable = true)
+    boolean all_agreement;
+
+    @Column(nullable = false)
+    boolean Age_14_older;
+
+    @Column(nullable = false)
+    boolean terms_of_Service;
+
+    @Column(nullable = false)
+    boolean use_of_personal_information;
+
+    @Column(nullable = true)
+    boolean receive_nightly_benefits;
+
+    @Column(nullable = true)
+    boolean promotion_marketing_use;
+
+    @Column(nullable = true)
+    boolean marketing_personal_information;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
