@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public interface SignService {
-    SignUpResultDto SignUpVerification(String name, String gender,Long birth_date,SmsCertificationDto smsCertificationDto,
+    SignUpResultDto SignUpVerification(String name, String gender,Long birth_date,String phone_num,boolean certification_num,
                                        HttpServletRequest request);
     SignUpResultDto SignUpEmailPassword(String email,String password
                                          , HttpServletRequest request);

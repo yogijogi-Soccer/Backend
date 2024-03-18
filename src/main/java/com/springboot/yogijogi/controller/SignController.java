@@ -36,11 +36,12 @@ public class SignController {
     }
 
     @PostMapping("/sign-up/sign-up-verification")
-    public SignUpResultDto SignUpVerification(@RequestParam String name, String gender,Long birth_date,SmsCertificationDto smsCertificationDto, HttpServletRequest request){
+    public SignUpResultDto SignUpVerification(@RequestParam String name, String gender,Long birth_date,String phone_num,boolean certification_num,
+                                              HttpServletRequest request){
         SignUpEssentialDto signUpEssentialDto = new SignUpEssentialDto();
         logger.info("[signUp] 회원가입을 수행합니다. id : {}, password : ****, name : {}, role : {}", signUpEssentialDto.getPhoneNum(),
                 signUpEssentialDto.getPassword());
-        SignUpResultDto signUpResultDto = signService.SignUpVerification(name,gender,birth_date,smsCertificationDto,request);
+        SignUpResultDto signUpResultDto = signService.SignUpVerification(name,gender,birth_date,phone_num,certification_num,request);
 
         return signUpResultDto;
     }
@@ -109,8 +110,8 @@ public class SignController {
         throw new RuntimeException("접근이 금지 되었습니다.");
      }
 
-    @PostMapping("/sign-api/sms")
-    public ResponseEntity<String> sendSMS(@RequestParam String phone_num) {
+    @PostMapping("/sign-api/send-sms")
+    public ResponseEntity<String> sendSMS( String phone_num) {
         try {
             String randomNum = smsService.sendSMS(phone_num);
             logger.info("[문자 인증 진행중] phoneNumber: {}, randomNum: {}", phone_num,randomNum);
@@ -120,6 +121,25 @@ public class SignController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("문자 전송 실패");
         }
     }
+
+    @PostMapping("/verify-sms")
+    public ResponseEntity<String> verifySms(@RequestParam String phone_num, @RequestParam String certification_num) {
+        try {
+            SmsCertificationDto smsCertificationDto = new SmsCertificationDto(phone_num, certification_num);
+            boolean isVerified = smsService.verifySms(smsCertificationDto);
+
+            if (isVerified) {
+                return ResponseEntity.ok("인증 성공");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 실패");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인증 과정 중 오류 발생");
+        }
+    }
+
+
+
 //    @PostMapping("/sign-api/sms-verify-process")
 //    public ResponseEntity<String> verifySms(SmsCertificationDto smsCertificationDto){
 //        smsService.verifySms(smsCertificationDto);
@@ -141,6 +161,8 @@ public class SignController {
 
         return new ResponseEntity<>(map, responseHeaders, httpStatus);
         }
+
+
     }
 
 

@@ -6,6 +6,8 @@ import com.springboot.yogijogi.service.SmsService;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.Random;
 
 @Service
 public class SmsServiceImpl implements SmsService {
+    private Logger logger = LoggerFactory.getLogger(SmsService.class);
 
     private final SmsCertification smsCertification;
 
@@ -63,25 +66,34 @@ public class SmsServiceImpl implements SmsService {
         String randomNum = createRandomNumber();
         System.out.println(randomNum);
 
+        //발신 정보 설정
+        HashMap<String,String> params = makeprams(phone_num,randomNum);
+
+        try{
+            JSONObject obj = (JSONObject) message.send(params);
+            System.out.println(obj.toString());
+        }catch (CoolsmsException e){
+            System.out.println(e.getMessage());
+            System.out.println(e.getCode());
+        }
+        // 데이터베이스에 발송한 인증번호 저장
+        smsCertification.createSmsCertification(phone_num, String.valueOf(randomNum));
+        logger.info("[sms] phone_num : {} , randomNum : {} ",phone_num,randomNum);
         return randomNum;
     }
-//
-//    // 인증 번호 검증
-//    public String verifySms(SmsCertificationDto smsCertificationDto){
-//
-//        if(!isVerify(smsCertificationDto)){
-//            throw new IllegalStateException("인증번호가 일치하지 않습니다.");
-//        }
-//        smsCertification.deleteSmsCertification(smsCertificationDto.getPhone_num());
-//
-//        return "인증완료";
-//
-//    }
-//    // 검증
-//
-//    public boolean isVerify(SmsCertificationDto smsCertificationDto){
-//        return !(smsCertification.hasKey(smsCertificationDto.getPhone_num())&&
-//                smsCertification.getSmsCertification(smsCertificationDto.getPhone_num()).equals(smsCertificationDto.getCertification_num()));
-//    }
+
+    // 인증 번호 검증
+// 인증 번호 검증
+    public boolean verifySms(SmsCertificationDto smsCertificationDto) {
+        if (smsCertification.hasKey(smsCertificationDto.getPhone_num()) &&
+                smsCertification.getSmsCertification(smsCertificationDto.getPhone_num()).equals(smsCertificationDto.getCertification_num())) {
+            // 인증 성공 시 인증 정보 삭제
+            smsCertification.deleteSmsCertification(smsCertificationDto.getPhone_num());
+            return true; // 인증 성공
+        } else {
+            return false; // 인증 실패
+        }
+    }
+
 
 }

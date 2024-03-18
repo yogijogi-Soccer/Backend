@@ -27,6 +27,7 @@ public class SignServiceImpl implements SignService {
 
 
 
+
     public SignServiceImpl(UserRepository userRepository,
                            JwtProvider jwtProvider,
                            PasswordEncoder passwordEncoder,
@@ -41,30 +42,36 @@ public class SignServiceImpl implements SignService {
 
 
     @Override
-    public SignUpResultDto SignUpVerification(String name, String gender,Long birth_date,SmsCertificationDto smsCertificationDto,
-                                              HttpServletRequest request) {
+    public SignUpResultDto SignUpVerification(String name, String gender, Long birth_date, String phone_num, boolean certification_num,HttpServletRequest request) {
 
+        String certificationNum = smsService.sendSMS(phone_num);
 
+        // 인증번호를 세션에 저장
+        request.getSession().setAttribute("phone_num", phone_num);
+        request.getSession().setAttribute("certification_num", certificationNum);
 
-            User user;
-            SignUpEssentialDto signUpEssentialDto = new SignUpEssentialDto();
-            user = User.builder()
+        SignUpResultDto signUpResultDto = new SignUpResultDto();
+
+        // SMS 인증번호 검증
+        SmsCertificationDto smsCertificationDto = new SmsCertificationDto();
+        smsCertificationDto.setPhone_num(phone_num);
+        smsCertificationDto.setCertification_num(certificationNum);
+        if (smsService.verifySms(smsCertificationDto)) {
+            // 인증 성공 시 RDBMS에 전화번호 저장
+            User user = User.builder()
                     .name(name)
                     .gender(gender)
                     .birth_date(birth_date)
-                    .phoneNum(smsCertificationDto.getPhone_num())
-                    .certification_num(smsCertificationDto.getCertification_num())
+                    .phoneNum(phone_num)
+                    .certification_num(true)
                     .build();
-
-
             request.getSession().setAttribute("partialUser", user);
 
-
-            SignUpResultDto signUpResultDto = new SignUpResultDto();
-
             setSuccess(signUpResultDto);
-
-            return signUpResultDto;
+        } else {
+            setFail(signUpResultDto);
+        }
+        return signUpResultDto;
     }
 
 
@@ -196,6 +203,7 @@ public class SignServiceImpl implements SignService {
     setSuccess(signInResultDto);
     return signInResultDto;
     }
+
 
     private void setSuccess(SignUpResultDto signUpResultDto){
         signUpResultDto.setSuccess(true);

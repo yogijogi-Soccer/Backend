@@ -45,7 +45,7 @@ public class User implements UserDetails {
     private String phoneNum;
 
     @Column(nullable = false)
-    private String certification_num;   // 인증번호
+    private boolean certification_num;   // 인증번호
 
     @Column(nullable = true)
     private boolean has_experience;  // 선수경험
