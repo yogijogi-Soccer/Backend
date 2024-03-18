@@ -18,4 +18,8 @@ public interface SignService {
     public SignUpResultDto SignUpAgreement(Agreement agreement, HttpServletRequest request);
 
     SignInResultDto SignIn(String phoneNum, String password);
+
+    String updatePassword(String phone_num,String password, HttpServletRequest request);
+
+
 }
