@@ -204,6 +204,33 @@ public class SignServiceImpl implements SignService {
     return signInResultDto;
     }
 
+    @Override
+    public String updatePassword(String phone_num,String password, HttpServletRequest request) {
+       String certification_num =  smsService.sendSMS(phone_num);
+
+       request.getSession().setAttribute("phone_num",phone_num);
+       request.getSession().setAttribute("certification",certification_num);
+
+       SmsCertificationDto smsCertificationDto2 = new SmsCertificationDto();
+
+       smsCertificationDto2.setPhone_num(phone_num);
+       smsCertificationDto2.setCertification_num(certification_num);
+
+        if(smsService.verifySms(smsCertificationDto2)){
+            User user = userRepository.findByPhoneNum(smsCertificationDto2.getPhone_num());
+            if(user != null){
+                user.setPassword(passwordEncoder.encode(password));
+                userRepository.save(user);
+                return "패스워드가 변경되었습니다.";
+            }else{
+                return "회원 정보가 없습니다. 회원가입 하세요.";
+            }
+        }else{
+
+            return "인증시실패";
+        }
+
+    }
 
     private void setSuccess(SignUpResultDto signUpResultDto){
         signUpResultDto.setSuccess(true);
@@ -218,4 +245,6 @@ public class SignServiceImpl implements SignService {
 
         signUpResultDto.setMsg(CommonResponse.Fail.getMsg());
     }
+
+
 }
