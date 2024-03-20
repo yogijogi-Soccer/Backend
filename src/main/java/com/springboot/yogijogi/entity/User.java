@@ -68,7 +68,7 @@ public class User implements UserDetails {
 
 
     //jpa에서 컬렉션 타입을 사용할때 쓰는 어노테이션
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
@@ -131,5 +131,7 @@ public class User implements UserDetails {
         return true;
     }
 
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Team> teams = new ArrayList<>(); // 사용자가 관리하는 팀 목록
 
 }

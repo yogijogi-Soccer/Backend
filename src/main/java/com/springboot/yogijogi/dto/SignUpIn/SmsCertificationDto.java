@@ -1,4 +1,4 @@
-package com.springboot.yogijogi.dto;
+package com.springboot.yogijogi.dto.SignUpIn;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;

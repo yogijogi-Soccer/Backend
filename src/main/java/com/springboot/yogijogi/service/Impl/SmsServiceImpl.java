@@ -1,6 +1,6 @@
 package com.springboot.yogijogi.service.Impl;
 
-import com.springboot.yogijogi.dto.SmsCertificationDto;
+import com.springboot.yogijogi.dto.SignUpIn.SmsCertificationDto;
 import com.springboot.yogijogi.redis.SmsCertification;
 import com.springboot.yogijogi.service.SmsService;
 import net.nurigo.java_sdk.api.Message;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -65,6 +64,8 @@ public class SmsServiceImpl implements SmsService {
         //랜덤한 인증 번호 생성
         String randomNum = createRandomNumber();
         System.out.println(randomNum);
+
+
 
         //발신 정보 설정
         HashMap<String,String> params = makeprams(phone_num,randomNum);

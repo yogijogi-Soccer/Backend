@@ -1,6 +1,6 @@
 package com.springboot.yogijogi.service;
 
-import com.springboot.yogijogi.dto.SmsCertificationDto;
+import com.springboot.yogijogi.dto.SignUpIn.SmsCertificationDto;
 
 import java.util.HashMap;
 
