@@ -1,8 +1,7 @@
 package com.springboot.yogijogi.controller;
 
 
-import com.springboot.yogijogi.dto.*;
-
+import com.springboot.yogijogi.dto.SignUpIn.*;
 import com.springboot.yogijogi.entity.User;
 import com.springboot.yogijogi.service.SignService;
 import com.springboot.yogijogi.service.SmsService;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +35,7 @@ public class SignController {
     }
 
     @PostMapping("/sign-up/sign-up-verification")
-    public SignUpResultDto SignUpVerification(@RequestParam String name, String gender,Long birth_date,String phone_num,boolean certification_num,
+    public SignUpResultDto SignUpVerification(@RequestParam String name, String gender, Long birth_date, String phone_num, boolean certification_num,
                                               HttpServletRequest request){
         SignUpEssentialDto signUpEssentialDto = new SignUpEssentialDto();
         logger.info("[signUp] 회원가입을 수행합니다. id : {}, password : ****, name : {}, role : {}", signUpEssentialDto.getPhoneNum(),
@@ -78,7 +76,7 @@ public class SignController {
 
 
     @PostMapping("/sign-up/sign-up-agreement")
-    public SignUpResultDto SignUpAgreement( Agreement agreement, HttpServletRequest request) {
+    public SignUpResultDto SignUpAgreement(Agreement agreement, HttpServletRequest request) {
         logger.info("[signUp] 회원가입을 수행합니다. agreement.isAge_14_older() : {}, position : {}",
                agreement.isAge_14_older());
         SignUpResultDto signUpResultDto = signService.SignUpAgreement(agreement,request);

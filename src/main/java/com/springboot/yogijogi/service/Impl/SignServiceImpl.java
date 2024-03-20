@@ -1,9 +1,12 @@
 package com.springboot.yogijogi.service.Impl;
 
 import com.springboot.yogijogi.dto.*;
+import com.springboot.yogijogi.dto.SignUpIn.Agreement;
+import com.springboot.yogijogi.dto.SignUpIn.SignInResultDto;
+import com.springboot.yogijogi.dto.SignUpIn.SignUpResultDto;
+import com.springboot.yogijogi.dto.SignUpIn.SmsCertificationDto;
 import com.springboot.yogijogi.entity.User;
 import com.springboot.yogijogi.jwt.JwtProvider;
-import com.springboot.yogijogi.redis.SmsCertification;
 import com.springboot.yogijogi.repository.UserRepository;
 import com.springboot.yogijogi.service.SignService;
 import com.springboot.yogijogi.service.SmsService;
@@ -11,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -42,7 +44,7 @@ public class SignServiceImpl implements SignService {
 
 
     @Override
-    public SignUpResultDto SignUpVerification(String name, String gender, Long birth_date, String phone_num, boolean certification_num,HttpServletRequest request) {
+    public SignUpResultDto SignUpVerification(String name, String gender, Long birth_date, String phone_num, boolean certification_num, HttpServletRequest request) {
 
         String certificationNum = smsService.sendSMS(phone_num);
 
