@@ -3,6 +3,8 @@ package com.springboot.yogijogi.controller;
 
 import com.springboot.yogijogi.dto.SignUpIn.*;
 import com.springboot.yogijogi.entity.User;
+import com.springboot.yogijogi.kakao.KakaoProfile;
+import com.springboot.yogijogi.kakao.OauthToken;
 import com.springboot.yogijogi.service.SignService;
 import com.springboot.yogijogi.service.SmsService;
 import org.slf4j.Logger;
@@ -33,6 +35,32 @@ public class SignController {
         this.signService = signService;
         this.smsService = smsService;
     }
+
+    @PostMapping("/kakao_access_token")
+    public ResponseEntity<OauthToken> getAccessToken(@RequestParam("code") String code){
+        try {
+            OauthToken oauthToken = signService.getAccessToken(code);
+            logger.info("[getAccessToken] accessToken : {} ", oauthToken);
+            return ResponseEntity.ok(oauthToken);
+        } catch (Exception e) {
+            logger.error("Error during getAccessToken", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/kakao_find_profile")
+    public ResponseEntity<KakaoProfile> findProfile(@RequestParam("token") String token){
+        try {
+            KakaoProfile kakaoProfile = new KakaoProfile();
+            logger.info("[findProfile] kakaoProfile : {} ", kakaoProfile);
+            return ResponseEntity.ok(kakaoProfile);
+        } catch (Exception e) {
+            logger.error("Error during getAccessToken", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
 
     @PostMapping("/sign-up/sign-up-verification")
     public SignUpResultDto SignUpVerification(@RequestParam String name, String gender, Long birth_date, String phone_num, boolean certification_num,
@@ -174,6 +202,8 @@ public class SignController {
         }
     }
 
-    }
+
+
+}
 
 

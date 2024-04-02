@@ -1,5 +1,6 @@
 package com.springboot.yogijogi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -131,7 +132,8 @@ public class User implements UserDetails {
         return true;
     }
 
-    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
     private List<Team> teams = new ArrayList<>(); // 사용자가 관리하는 팀 목록
 
 }

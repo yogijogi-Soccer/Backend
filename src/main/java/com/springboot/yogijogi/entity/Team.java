@@ -53,7 +53,7 @@ public class Team {
     @Column(nullable = true)
     private String invite_code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User manager; // 팀의 관리자 (감독 또는 총무)
 

@@ -1,5 +1,8 @@
 package com.springboot.yogijogi.service.Impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.yogijogi.dto.*;
 import com.springboot.yogijogi.dto.SignUpIn.Agreement;
 import com.springboot.yogijogi.dto.SignUpIn.SignInResultDto;
@@ -7,11 +10,24 @@ import com.springboot.yogijogi.dto.SignUpIn.SignUpResultDto;
 import com.springboot.yogijogi.dto.SignUpIn.SmsCertificationDto;
 import com.springboot.yogijogi.entity.User;
 import com.springboot.yogijogi.jwt.JwtProvider;
+import com.springboot.yogijogi.kakao.KakaoProfile;
+import com.springboot.yogijogi.kakao.OauthToken;
 import com.springboot.yogijogi.repository.UserRepository;
 import com.springboot.yogijogi.service.SignService;
 import com.springboot.yogijogi.service.SmsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -19,6 +35,14 @@ import java.util.List;
 @Service
 public class SignServiceImpl implements SignService {
 
+    @Value("${kakao.client.id}")
+    private String clientId;
+
+    @Value("${kakao.redirect.uri}")
+    private String redirectUri;
+
+    @Value("${kakao.client.secret}")
+    private String clientSecret;
 
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
@@ -26,8 +50,7 @@ public class SignServiceImpl implements SignService {
     private final SmsService smsService;
     private SmsCertificationDto smsCertificationDto;
 
-
-
+    private Logger logger = LoggerFactory.getLogger(SignServiceImpl.class);
 
 
     public SignServiceImpl(UserRepository userRepository,
@@ -41,8 +64,62 @@ public class SignServiceImpl implements SignService {
         this.smsService = smsService;
     }
 
+    //카카오톡 인가코드 받아오기
 
 
+    @Override
+    public OauthToken getAccessToken(String code) {
+        RestTemplate rt = new RestTemplate();
+        rt.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String,String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type","authorization_code");
+        params.add("client_id",clientId);
+        params.add("redirect_uri",redirectUri);
+        params.add("code",code);
+        params.add("client_secret",clientSecret);
+
+        HttpEntity<MultiValueMap<String,String>> kakaoTokenRequest =
+                new HttpEntity<>(params,headers);
+
+        ResponseEntity<String> accessTokenResponse = rt.exchange(
+                "https://kauth.kakao.com/oauth/token",
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );
+
+        String reponseBody = accessTokenResponse.getBody();
+
+        // 객체로부터 JSON 형태의 문자열을 만들어냄 -> 직렬화
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        OauthToken oauthToken = null;
+
+        try{
+            oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthToken.class);
+        }catch(JsonMappingException e){
+            e.printStackTrace();
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+        }
+        logger.info("[getAccessToken] accessToken :{} " , oauthToken.getAccess_token());
+        System.out.println("KakaoAccessToken : "+oauthToken.getAccess_token());
+
+        return oauthToken;
+
+    }
+
+    @Override
+    public String KakaoLogin(String token, HttpServletRequest request) {
+     return null;
+    }
+
+    // 본인인증 페이지
     @Override
     public SignUpResultDto SignUpVerification(String name, String gender, Long birth_date, String phone_num, boolean certification_num, HttpServletRequest request) {
 
@@ -76,6 +153,40 @@ public class SignServiceImpl implements SignService {
         return signUpResultDto;
     }
 
+    @Override
+    public KakaoProfile findProfile(String token) {
+        RestTemplate rt = new RestTemplate();
+
+        OauthToken oauthToken = null;
+        HttpHeaders headers = new HttpHeaders();
+
+        //Bearer: OAuth 2.0 토큰을 사용하는 인증 스킴의 일종
+        //"Bearer" 다음에 오는 토큰 값은 서버가 클라이언트를 식별하고 인증.
+        headers.add("Authorization","Bearer "+ token);
+        headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<MultiValueMap<String,String>>kakaoProfileRequest =
+                new HttpEntity<>(headers);
+
+        ResponseEntity<String> kakaoProfileResponse = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.POST,
+                kakaoProfileRequest,
+                String.class
+        );
+
+        String responseBody = kakaoProfileResponse.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        KakaoProfile kakaoProfile = null;
+
+        try{
+            kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(kakaoProfile);
+        return kakaoProfile;
+    }
 
     @Override
     public SignUpResultDto SignUpEmailPassword(String email,String password, HttpServletRequest request ) {
@@ -138,7 +249,7 @@ public class SignServiceImpl implements SignService {
 
             partialUser.setAvailable_days(available_days);
             partialUser.setAvailable_time_start(available_time_start);
-            partialUser.setAvailable_time_end(available_time_start);
+            partialUser.setAvailable_time_end(available_time_end);
 
 
             User savedUser = userRepository.save(partialUser);

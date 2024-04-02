@@ -8,7 +8,7 @@ import com.springboot.yogijogi.dto.Team.TeamResultDto;
 import com.springboot.yogijogi.entity.Team;
 import com.springboot.yogijogi.entity.User;
 import com.springboot.yogijogi.jwt.JwtProvider;
-import com.springboot.yogijogi.repository.TeamRepository;
+import com.springboot.yogijogi.repository.Team.TeamRepository;
 import com.springboot.yogijogi.repository.UserRepository;
 import com.springboot.yogijogi.service.TeamService;
 import org.slf4j.Logger;
