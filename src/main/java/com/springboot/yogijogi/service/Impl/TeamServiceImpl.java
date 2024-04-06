@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Random;
 
 
 @Service
@@ -107,6 +108,7 @@ public class TeamServiceImpl implements TeamService {
                 setSuccess(teamResultDto);
             }
         }
+
         return teamResultDto;
     }
 
@@ -116,6 +118,7 @@ public class TeamServiceImpl implements TeamService {
 
         Team partialTeam = (Team) request.getSession().getAttribute("partialTeam");
         System.out.println(partialTeam);
+        String invite_code = make_InviteCode();
 
         TeamResultDto teamResultDto = new TeamResultDto();
         if(user == null){
@@ -126,7 +129,7 @@ public class TeamServiceImpl implements TeamService {
             }else{
                 partialTeam.setGender(teamMoreInfodDto2.getGender());
                 partialTeam.setAge(teamMoreInfodDto2.getAge());
-
+                partialTeam.setInvite_code(invite_code);
 
                 teamRepository.save(partialTeam);
                 setSuccess(teamResultDto);
@@ -136,6 +139,20 @@ public class TeamServiceImpl implements TeamService {
         return teamResultDto;
     }
 
+
+    private String make_InviteCode(){
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 7;
+        Random random = new Random();
+
+        String randomNum = random.ints(leftLimit,rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        return randomNum;
+    }
 
     private void setSuccess(TeamResultDto teamResultDto){
         teamResultDto.setSuccess(true);
