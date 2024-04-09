@@ -1,15 +1,12 @@
 package com.springboot.yogijogi.service.Impl;
 
 import com.springboot.yogijogi.dto.*;
-import com.springboot.yogijogi.dto.Team.TeamMoreInfodDto1;
-import com.springboot.yogijogi.dto.Team.TeamMoreInfodDto2;
-import com.springboot.yogijogi.dto.Team.TeamProfileDto;
-import com.springboot.yogijogi.dto.Team.TeamResultDto;
+import com.springboot.yogijogi.dto.Team.*;
+import com.springboot.yogijogi.entity.Member;
 import com.springboot.yogijogi.entity.Team;
-import com.springboot.yogijogi.entity.User;
 import com.springboot.yogijogi.jwt.JwtProvider;
 import com.springboot.yogijogi.repository.Team.TeamRepository;
-import com.springboot.yogijogi.repository.UserRepository;
+import com.springboot.yogijogi.repository.MemberRepository;
 import com.springboot.yogijogi.service.TeamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,37 +22,37 @@ public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
 
     private Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
-    private TeamServiceImpl (TeamRepository teamRepository, JwtProvider jwtProvider,UserRepository userRepository){
+    private TeamServiceImpl (TeamRepository teamRepository, JwtProvider jwtProvider, MemberRepository memberRepository){
         this.teamRepository = teamRepository;
         this.jwtProvider = jwtProvider;
-        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
     }
 
-    private User findUser(String token){
+    private Member findUser(String token){
         logger.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
         String info = jwtProvider.getUsername(token);
-        User user = userRepository.findByPhoneNum(info);
+        Member member = memberRepository.findByPhoneNum(info);
 
         logger.info("[getUsername] 토큰 기반 회원 구별 정보 추출 완료 info: {} " ,info);
-        return user;
+        return member;
     }
 
     private boolean updateUserRole(String token, String newRole){
-        User findUser = findUser(token);
-        if(findUser == null){
+        Member findMember = findUser(token);
+        if(findMember == null){
             logger.info("[updateUserRole] 사용자를 찾을 수 없습니다.");
             return false;
         }
 
-        List<String> roles = findUser.getRoles();
+        List<String> roles = findMember.getRoles();
         if(!roles.contains(newRole)){
             roles.add(newRole);//새로운 역할 추가
-            findUser.setRoles(roles);
-            userRepository.save(findUser);
+            findMember.setRoles(roles);
+            memberRepository.save(findMember);
             logger.info("[updateUserRole] 사용자 역할 업데이트 완료: {}" ,newRole);
             return  true;
         }
@@ -64,10 +61,10 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamResultDto createTeam(HttpServletRequest request, String token, TeamProfileDto teamProfileDto) {
-        User user = findUser(token);
+        Member member = findUser(token);
 
         TeamResultDto teamResultDto = new TeamResultDto();
-        if(user == null){
+        if(member == null){
             setFail(teamResultDto);
         }else{
         updateUserRole(token,"Role_Manager");
@@ -85,13 +82,13 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamResultDto TeamMoreInfo1(HttpServletRequest request, String token, TeamMoreInfodDto1 teamMoreInfodDto1) {
-        User user = findUser(token);
+        Member member = findUser(token);
 
         Team partialTeam = (Team) request.getSession().getAttribute("partialTeam");
         System.out.println(partialTeam);
 
         TeamResultDto teamResultDto = new TeamResultDto();
-        if(user ==null){
+        if(member ==null){
             setFail(teamResultDto);
         }else{
             if(partialTeam==null){
@@ -114,14 +111,14 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamResultDto TeamMoreInfo2(HttpServletRequest request, String token, TeamMoreInfodDto2 teamMoreInfodDto2) {
-        User user = findUser(token);
+        Member member = findUser(token);
 
         Team partialTeam = (Team) request.getSession().getAttribute("partialTeam");
         System.out.println(partialTeam);
         String invite_code = make_InviteCode();
 
         TeamResultDto teamResultDto = new TeamResultDto();
-        if(user == null){
+        if(member == null){
             setFail(teamResultDto);
         }else{
             if(partialTeam==null){
@@ -129,7 +126,7 @@ public class TeamServiceImpl implements TeamService {
             }else{
                 partialTeam.setGender(teamMoreInfodDto2.getGender());
                 partialTeam.setAge(teamMoreInfodDto2.getAge());
-                partialTeam.setInvite_code(invite_code);
+                partialTeam.setInviteCode(invite_code);
 
                 teamRepository.save(partialTeam);
                 setSuccess(teamResultDto);
@@ -138,6 +135,7 @@ public class TeamServiceImpl implements TeamService {
 
         return teamResultDto;
     }
+
 
 
     private String make_InviteCode(){
@@ -154,6 +152,31 @@ public class TeamServiceImpl implements TeamService {
         return randomNum;
     }
 
+    @Override
+    public TeamInviteCodeDto JoinInviteCode(String request, String invite_code) {
+        // 초대 코드에 해당하는 팀을 데이터베이스에서 검색
+        Team team = teamRepository.findByInviteCode(invite_code);
+
+        if (team != null) { // 팀이 존재하는 경우
+            // 초대 코드가 일치하는 경우
+            if (invite_code.equals(team.getInviteCode())) {
+                TeamInviteCodeDto teamInviteCodeDto = new TeamInviteCodeDto();
+                teamInviteCodeDto.setInvite_code(invite_code);
+                teamInviteCodeDto.setTeam_name(team.getTeam_name());
+                teamInviteCodeDto.setTeam_image(team.getTeam_image());
+                logger.info("[teamInviteCodeDto] : {} ", teamInviteCodeDto);
+                return teamInviteCodeDto;
+            } else {
+                // 초대 코드가 일치하지 않는 경우 예외를 던집니다.
+                throw new IllegalArgumentException("팀이 일치하지 않습니다.");
+            }
+        } else {
+            // 팀이 존재하지 않는 경우 예외를 던집니다.
+            throw new IllegalArgumentException("팀이 존재하지 않습니다.");
+        }
+    }
+
+
     private void setSuccess(TeamResultDto teamResultDto){
         teamResultDto.setSuccess(true);
         teamResultDto.setCode(CommonResponse.SUCCESS.getCode());
@@ -167,4 +190,7 @@ public class TeamServiceImpl implements TeamService {
 
         teamResultDto.setMsg(CommonResponse.Fail.getMsg());
     }
+
+
+
 }

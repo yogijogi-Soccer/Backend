@@ -52,4 +52,6 @@ public class TeamRepositoryCustomImpl implements TeamRepositoryCustom {
                 .where(qTeam.activity_time.contains(time))
                 .fetch();
     }
+
+
 }

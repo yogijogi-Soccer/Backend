@@ -8,11 +8,11 @@ import com.springboot.yogijogi.dto.SignUpIn.Agreement;
 import com.springboot.yogijogi.dto.SignUpIn.SignInResultDto;
 import com.springboot.yogijogi.dto.SignUpIn.SignUpResultDto;
 import com.springboot.yogijogi.dto.SignUpIn.SmsCertificationDto;
-import com.springboot.yogijogi.entity.User;
+import com.springboot.yogijogi.entity.Member;
 import com.springboot.yogijogi.jwt.JwtProvider;
 import com.springboot.yogijogi.kakao.KakaoProfile;
 import com.springboot.yogijogi.kakao.OauthToken;
-import com.springboot.yogijogi.repository.UserRepository;
+import com.springboot.yogijogi.repository.MemberRepository;
 import com.springboot.yogijogi.service.SignService;
 import com.springboot.yogijogi.service.SmsService;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class SignServiceImpl implements SignService {
     @Value("${kakao.client.secret}")
     private String clientSecret;
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
     private final SmsService smsService;
@@ -53,12 +53,12 @@ public class SignServiceImpl implements SignService {
     private Logger logger = LoggerFactory.getLogger(SignServiceImpl.class);
 
 
-    public SignServiceImpl(UserRepository userRepository,
+    public SignServiceImpl(MemberRepository memberRepository,
                            JwtProvider jwtProvider,
                            PasswordEncoder passwordEncoder,
                            SmsService smsService
                            ){
-        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
         this.smsService = smsService;
@@ -137,14 +137,14 @@ public class SignServiceImpl implements SignService {
         smsCertificationDto.setCertification_num(certificationNum);
         if (smsService.verifySms(smsCertificationDto)) {
             // 인증 성공 시 RDBMS에 전화번호 저장
-            User user = User.builder()
+            Member member = Member.builder()
                     .name(name)
                     .gender(gender)
                     .birth_date(birth_date)
                     .phoneNum(phone_num)
                     .certification_num(true)
                     .build();
-            request.getSession().setAttribute("partialUser", user);
+            request.getSession().setAttribute("partialUser", member);
 
             setSuccess(signUpResultDto);
         } else {
@@ -192,15 +192,15 @@ public class SignServiceImpl implements SignService {
     public SignUpResultDto SignUpEmailPassword(String email,String password, HttpServletRequest request ) {
 
 
-        User partialUser = (User) request.getSession().getAttribute("partialUser");
-        System.out.println(partialUser);
+        Member partialMember = (Member) request.getSession().getAttribute("partialUser");
+        System.out.println(partialMember);
 
-        if(partialUser != null){
-            partialUser.setEmail(email);
-            partialUser.setPassword(passwordEncoder.encode(password));
+        if(partialMember != null){
+            partialMember.setEmail(email);
+            partialMember.setPassword(passwordEncoder.encode(password));
 
             SignUpResultDto signUpResultDto = new SignUpResultDto();
-            if(!partialUser.getEmail().isEmpty()){
+            if(!partialMember.getEmail().isEmpty()){
                 setSuccess(signUpResultDto);
             }else{
                 setFail(signUpResultDto);
@@ -217,16 +217,16 @@ public class SignServiceImpl implements SignService {
 
     @Override
     public SignUpResultDto SignUpAdditionalInfo(boolean has_experience, List<String> position, HttpServletRequest request) {
-        User partialUser = (User) request.getSession().getAttribute("partialUser");
-        System.out.println(partialUser);
+        Member partialMember = (Member) request.getSession().getAttribute("partialUser");
+        System.out.println(partialMember);
 
-        if(partialUser != null){
-            partialUser.setHas_experience(has_experience);
-            partialUser.setPosition(position);
-            User savedUser = userRepository.save(partialUser);
+        if(partialMember != null){
+            partialMember.setHas_experience(has_experience);
+            partialMember.setPosition(position);
+            Member savedMember = memberRepository.save(partialMember);
 
             SignUpResultDto signUpResultDto = new SignUpResultDto();
-            if(!savedUser.getEmail().isEmpty()){
+            if(!savedMember.getEmail().isEmpty()){
                 setSuccess(signUpResultDto);
             }else{
                 setFail(signUpResultDto);
@@ -242,20 +242,20 @@ public class SignServiceImpl implements SignService {
 
     @Override
     public SignUpResultDto SignUpAdditionalInfo2(List<String> available_days, String available_time_start,String  available_time_end, HttpServletRequest request) {
-        User partialUser = (User) request.getSession().getAttribute("partialUser");
-        System.out.println(partialUser);
+        Member partialMember = (Member) request.getSession().getAttribute("partialUser");
+        System.out.println(partialMember);
 
-        if(partialUser != null){
+        if(partialMember != null){
 
-            partialUser.setAvailable_days(available_days);
-            partialUser.setAvailable_time_start(available_time_start);
-            partialUser.setAvailable_time_end(available_time_end);
+            partialMember.setAvailable_days(available_days);
+            partialMember.setAvailable_time_start(available_time_start);
+            partialMember.setAvailable_time_end(available_time_end);
 
 
-            User savedUser = userRepository.save(partialUser);
+            Member savedMember = memberRepository.save(partialMember);
 
             SignUpResultDto signUpResultDto = new SignUpResultDto();
-            if(!savedUser.getEmail().isEmpty()){
+            if(!savedMember.getEmail().isEmpty()){
                 setSuccess(signUpResultDto);
             }else{
                 setFail(signUpResultDto);
@@ -270,25 +270,25 @@ public class SignServiceImpl implements SignService {
 
     @Override
     public SignUpResultDto SignUpAgreement(Agreement agreement, HttpServletRequest request) {
-        User partialUser = (User) request.getSession().getAttribute("partialUser");
+        Member partialMember = (Member) request.getSession().getAttribute("partialUser");
 
-        System.out.println(partialUser);
+        System.out.println(partialMember);
 
-        if(partialUser != null){
+        if(partialMember != null){
 
-            partialUser.setAll_agreement(agreement.isAll_agreement());
-            partialUser.setAll_agreement(agreement.isAge_14_older());
-            partialUser.setAll_agreement(agreement.isTerms_of_Service());
-            partialUser.setAll_agreement(agreement.isUse_of_personal_information());
-            partialUser.setAll_agreement(agreement.isReceive_nightly_benefits());
-            partialUser.setAll_agreement(agreement.isPromotion_marketing_use());
-            partialUser.setAll_agreement(agreement.isMarketing_personal_information());
+            partialMember.setAll_agreement(agreement.isAll_agreement());
+            partialMember.setAll_agreement(agreement.isAge_14_older());
+            partialMember.setAll_agreement(agreement.isTerms_of_Service());
+            partialMember.setAll_agreement(agreement.isUse_of_personal_information());
+            partialMember.setAll_agreement(agreement.isReceive_nightly_benefits());
+            partialMember.setAll_agreement(agreement.isPromotion_marketing_use());
+            partialMember.setAll_agreement(agreement.isMarketing_personal_information());
 
 
-            User savedUser = userRepository.save(partialUser);
+            Member savedMember = memberRepository.save(partialMember);
 
             SignUpResultDto signUpResultDto = new SignUpResultDto();
-            if(!savedUser.getEmail().isEmpty()){
+            if(!savedMember.getEmail().isEmpty()){
                 setSuccess(signUpResultDto);
             }else{
                 setFail(signUpResultDto);
@@ -305,13 +305,13 @@ public class SignServiceImpl implements SignService {
 
     @Override
     public SignInResultDto SignIn(String phoneNum, String password) {
-      User user = userRepository.getByPhoneNum(phoneNum);
-      if(!passwordEncoder.matches(password,user.getPassword())){
+      Member member = memberRepository.getByPhoneNum(phoneNum);
+      if(!passwordEncoder.matches(password, member.getPassword())){
           throw new RuntimeException();
       }
       SignInResultDto signInResultDto = SignInResultDto.builder()
-              .token(jwtProvider.createToken(String.valueOf(user.getPhoneNum())
-                      ,user.getRoles()))
+              .token(jwtProvider.createToken(String.valueOf(member.getPhoneNum())
+                      , member.getRoles()))
               .build();
     setSuccess(signInResultDto);
     return signInResultDto;
@@ -330,10 +330,10 @@ public class SignServiceImpl implements SignService {
        smsCertificationDto2.setCertification_num(certification_num);
 
         if(smsService.verifySms(smsCertificationDto2)){
-            User user = userRepository.findByPhoneNum(smsCertificationDto2.getPhone_num());
-            if(user != null){
-                user.setPassword(passwordEncoder.encode(password));
-                userRepository.save(user);
+            Member member = memberRepository.findByPhoneNum(smsCertificationDto2.getPhone_num());
+            if(member != null){
+                member.setPassword(passwordEncoder.encode(password));
+                memberRepository.save(member);
                 return "패스워드가 변경되었습니다.";
             }else{
                 return "회원 정보가 없습니다. 회원가입 하세요.";

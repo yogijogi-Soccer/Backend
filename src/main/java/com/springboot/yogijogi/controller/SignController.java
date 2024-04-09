@@ -2,7 +2,7 @@ package com.springboot.yogijogi.controller;
 
 
 import com.springboot.yogijogi.dto.SignUpIn.*;
-import com.springboot.yogijogi.entity.User;
+import com.springboot.yogijogi.entity.Member;
 import com.springboot.yogijogi.kakao.KakaoProfile;
 import com.springboot.yogijogi.kakao.OauthToken;
 import com.springboot.yogijogi.service.SignService;
@@ -192,12 +192,12 @@ public class SignController {
 
     @PatchMapping("/update-password")
     public ResponseEntity<String> updatePassword( @RequestParam String phone_num,@RequestParam String password, HttpServletRequest request) {
-        User user = new User();
+        Member member = new Member();
         try {
             signService.updatePassword(phone_num,password,request);
             return ResponseEntity.ok("비밀번호 변경 완료 : " + password);
         } catch (Exception e) {
-            logger.error("[비밀번호 변경 실패] phoneNumber: {}, error: {}", user.getPhoneNum(), e.getMessage());
+            logger.error("[비밀번호 변경 실패] phoneNumber: {}, error: {}", member.getPhoneNum(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 변경 실패");
         }
     }

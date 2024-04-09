@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,11 +52,11 @@ public class Team {
     private String age;
 
     @Column(nullable = true)
-    private String invite_code;
+    private String inviteCode;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User manager; // 팀의 관리자 (감독 또는 총무)
+    private Member manager; // 팀의 관리자 (감독 또는 총무)
 
 
 

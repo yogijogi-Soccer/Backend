@@ -1,11 +1,8 @@
 package com.springboot.yogijogi.controller;
 
-import com.springboot.yogijogi.dto.Team.TeamMoreInfodDto1;
-import com.springboot.yogijogi.dto.Team.TeamMoreInfodDto2;
-import com.springboot.yogijogi.dto.Team.TeamProfileDto;
-import com.springboot.yogijogi.dto.Team.TeamResultDto;
+import com.springboot.yogijogi.dto.Team.*;
 import com.springboot.yogijogi.jwt.JwtProvider;
-import com.springboot.yogijogi.repository.UserRepository;
+import com.springboot.yogijogi.repository.MemberRepository;
 import com.springboot.yogijogi.service.Impl.TeamServiceImpl;
 import com.springboot.yogijogi.service.TeamService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -25,15 +22,15 @@ public class TeamController {
 
     private final TeamService teamService;
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
 
     private Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
     @Autowired
-    private TeamController (TeamService teamService, JwtProvider jwtProvider,UserRepository userRepository){
+    private TeamController (TeamService teamService, JwtProvider jwtProvider, MemberRepository memberRepository){
         this.teamService = teamService;
         this.jwtProvider = jwtProvider;
-        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
     }
 
     @PostMapping("/create")
@@ -76,6 +73,16 @@ public class TeamController {
         } else {
             return new ResponseEntity<>(teamResultDto, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/invite_code")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamInviteCodeDto> JoinInviteCode(HttpServletRequest request,
+                                                       @RequestParam String invite_code) {
+        TeamInviteCodeDto teamInviteCodeDto = teamService.JoinInviteCode(request.getHeader("X-AUTH-TOKEN"), invite_code);
+        return ResponseEntity.status(HttpStatus.OK).body(teamInviteCodeDto);
     }
 
 }

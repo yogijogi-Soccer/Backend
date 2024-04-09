@@ -10,4 +10,5 @@ public interface TeamRepositoryCustom {
     List<Team> searchGender(String gender);
     List<Team> searchDay(String activity_days);
     List<Team> searchTime(String time);
+
 }
