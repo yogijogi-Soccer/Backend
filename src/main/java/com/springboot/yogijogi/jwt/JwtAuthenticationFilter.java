@@ -1,6 +1,7 @@
 package com.springboot.yogijogi.jwt;
 
 
+import com.springboot.yogijogi.entity.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -35,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         logger.info("[dofilterInternal] token 값 추출 체크 시작" );
         if(token!=null && jwtProvider.validToken(token)){
             Authentication authentication = jwtProvider.getAuthentication(token);
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.info("[dofilterInternal] token 값 유효성 체크 완료");
         }

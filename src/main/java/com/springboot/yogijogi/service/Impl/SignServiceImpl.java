@@ -9,6 +9,7 @@ import com.springboot.yogijogi.dto.SignUpIn.SignInResultDto;
 import com.springboot.yogijogi.dto.SignUpIn.SignUpResultDto;
 import com.springboot.yogijogi.dto.SignUpIn.SmsCertificationDto;
 import com.springboot.yogijogi.entity.Member;
+import com.springboot.yogijogi.entity.MemberRole;
 import com.springboot.yogijogi.jwt.JwtProvider;
 import com.springboot.yogijogi.kakao.KakaoProfile;
 import com.springboot.yogijogi.kakao.OauthToken;
@@ -31,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SignServiceImpl implements SignService {
@@ -309,10 +311,11 @@ public class SignServiceImpl implements SignService {
       if(!passwordEncoder.matches(password, member.getPassword())){
           throw new RuntimeException();
       }
-      SignInResultDto signInResultDto = SignInResultDto.builder()
-              .token(jwtProvider.createToken(String.valueOf(member.getPhoneNum())
-                      , member.getRoles()))
-              .build();
+        SignInResultDto signInResultDto = SignInResultDto.builder()
+                .token(jwtProvider.createToken(String.valueOf(member.getPhoneNum()), member.getMemberRoles().stream()
+                        .map(MemberRole::getRole)
+                        .collect(Collectors.toList())))
+                .build();
     setSuccess(signInResultDto);
     return signInResultDto;
     }

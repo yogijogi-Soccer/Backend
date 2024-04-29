@@ -3,6 +3,7 @@ package com.springboot.yogijogi.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,13 +65,6 @@ public class Member implements UserDetails {
     private String  available_time_end;  // 종료 시간
 
 
-
-
-    //jpa에서 컬렉션 타입을 사용할때 쓰는 어노테이션
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    private List<String> roles = new ArrayList<>();
-
     @Column(nullable = true)
     boolean all_agreement;
 
@@ -94,8 +88,8 @@ public class Member implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
+        return this.memberRoles.stream()
+                .map(memberRole -> new SimpleGrantedAuthority(memberRole.getRole()))
                 .collect(Collectors.toList());
     }
 
@@ -131,7 +125,18 @@ public class Member implements UserDetails {
     }
 
 
-    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
-    private List<Team> teams = new ArrayList<>(); // 사용자가 관리하는 팀 목록
+    @ElementCollection(fetch = FetchType.LAZY)
+    private List<String> joinTeam;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    private List<String> createTeam;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id") // Member 엔티티에서 Team 엔티티를 참조하는 외래 키
+    private Team team;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<MemberRole> memberRoles;
+
 
 }

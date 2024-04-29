@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,14 +76,25 @@ public class TeamController {
         }
     }
 
-    @PostMapping("/invite_code")
+    @PostMapping("/select-invite_code")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
     })
-    public ResponseEntity<TeamInviteCodeDto> JoinInviteCode(HttpServletRequest request,
+    public ResponseEntity<TeamInviteCodeDto> SelectTeamByInviteCode(HttpServletRequest request,
                                                        @RequestParam String invite_code) {
-        TeamInviteCodeDto teamInviteCodeDto = teamService.JoinInviteCode(request.getHeader("X-AUTH-TOKEN"), invite_code);
+        TeamInviteCodeDto teamInviteCodeDto = teamService.SelectTeamByInviteCode(request,request.getHeader("X-AUTH-TOKEN"), invite_code);
         return ResponseEntity.status(HttpStatus.OK).body(teamInviteCodeDto);
     }
+
+    @PostMapping("/join-invite_code")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamResultDto> JoinUpByInviteCode(HttpServletRequest request) {
+        TeamResultDto teamResultDto = teamService.JoinUpByInviteCode(request,request.getHeader("X-AUTH-TOKEN"));
+        return ResponseEntity.status(HttpStatus.OK).body(teamResultDto);
+    }
+
+
 
 }

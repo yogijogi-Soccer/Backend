@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -54,9 +55,13 @@ public class Team {
     @Column(nullable = true)
     private String inviteCode;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private Member manager; // 팀의 관리자 (감독 또는 총무)
+
+    @ManyToOne
+    @JoinColumn(name = "manager_uid") // 매니저를 참조하는 외래 키
+    private Member manager; // 매니저 정보 추가
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<MemberRole> memberRoles;
 
 
 

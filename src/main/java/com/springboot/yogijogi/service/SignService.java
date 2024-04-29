@@ -17,7 +17,7 @@ public interface SignService {
     SignUpResultDto SignUpAdditionalInfo(boolean has_experience, List<String> position, HttpServletRequest request);
 
     SignUpResultDto SignUpAdditionalInfo2(List<String> available_days, String available_time_start, String  available_time_end, HttpServletRequest request);
-    public SignUpResultDto SignUpAgreement(Agreement agreement, HttpServletRequest request);
+    SignUpResultDto SignUpAgreement(Agreement agreement, HttpServletRequest request);
 
     SignInResultDto SignIn(String phoneNum, String password);
 
