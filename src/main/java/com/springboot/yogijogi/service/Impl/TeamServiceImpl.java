@@ -46,7 +46,6 @@ public class TeamServiceImpl implements TeamService {
 
 
     @Override
-    @Transactional
     public TeamResultDto createTeam(HttpServletRequest request, String token, TeamProfileDto teamProfileDto) {
         Member member = findUser(token);
 
@@ -71,7 +70,6 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    @Transactional
     public TeamResultDto TeamMoreInfo1(HttpServletRequest request, String token, TeamMoreInfodDto1 teamMoreInfodDto1) {
         Member member = findUser(token);
 
@@ -101,7 +99,6 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    @Transactional
     public TeamResultDto TeamMoreInfo2(HttpServletRequest request, String token, TeamMoreInfodDto2 teamMoreInfodDto2) {
         Member member = findUser(token);
 
@@ -126,7 +123,7 @@ public class TeamServiceImpl implements TeamService {
 
                 List<String>joinTeams = member.getJoinTeam();
                 joinTeams.add(partialTeam.getTeam_name());
-
+                saveMemberRole(member,partialTeam,"ROLE_MANAGER");
 
                 teamRepository.save(partialTeam);
                 setSuccess(teamResultDto);
@@ -226,6 +223,5 @@ public class TeamServiceImpl implements TeamService {
         memberRole.setRole(role);
         member.getMemberRoles().add(memberRole);
     }
-
 
 }

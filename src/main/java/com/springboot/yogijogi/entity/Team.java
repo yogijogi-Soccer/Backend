@@ -56,6 +56,8 @@ public class Team {
     private String inviteCode;
 
 
+
+
     @ManyToOne
     @JoinColumn(name = "manager_uid") // 매니저를 참조하는 외래 키
     private Member manager; // 매니저 정보 추가
