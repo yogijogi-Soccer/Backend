@@ -1,6 +1,7 @@
 package com.springboot.yogijogi.controller;
 
 import com.springboot.yogijogi.dto.Team.*;
+import com.springboot.yogijogi.entity.Member;
 import com.springboot.yogijogi.jwt.JwtProvider;
 import com.springboot.yogijogi.repository.MemberRepository;
 import com.springboot.yogijogi.service.Impl.TeamServiceImpl;
@@ -95,6 +96,33 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(teamResultDto);
     }
 
+    @GetMapping ("/join-up-select-team")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamJoinSelectDto> JoinUpSelectInfo(HttpServletRequest request,
+                                                              @RequestParam Long id) {
+        TeamJoinSelectDto teamJoinSelectDto = teamService.JoinUpSelectTeamInfo(request,request.getHeader("X-AUTH-TOKEN"), id);
+        return ResponseEntity.status(HttpStatus.OK).body(teamJoinSelectDto);
+    }
+
+    @GetMapping ("/join-up-select-mamber")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamJoinSelectMemberDto> JoinUpSelectMemberInfo(HttpServletRequest request) {
+        TeamJoinSelectMemberDto teamJoinSelectMemberDto1 = teamService.JoinUpSelectMemberInfo(request,request.getHeader("X-AUTH-TOKEN"));
+        return ResponseEntity.status(HttpStatus.OK).body(teamJoinSelectMemberDto1);
+    }
+
+    @PostMapping ("/join-up-form")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamResultDto> JoinUp(HttpServletRequest request, TeamJoinDto teamJoin) {
+        TeamResultDto teamResultDto = teamService.JoinUp(request,request.getHeader("X-AUTH-TOKEN"),teamJoin);
+        return ResponseEntity.status(HttpStatus.OK).body(teamResultDto);
+    }
 
 
 }

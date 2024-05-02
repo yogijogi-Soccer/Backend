@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class TeamMoreInfodDto2 {
     private String gender;
-
     private String age;
-
+    private String dues;
+    private String level;
 
 }

@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TeamRepository extends JpaRepository<Team,Long>,TeamRepositoryCustom {
 
     Team findByInviteCode(String inviteCode);
+    Team findByTeamId(Long teamId);
+
 }

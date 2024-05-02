@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -135,8 +134,12 @@ public class Member implements UserDetails {
     @JoinColumn(name = "team_id") // Member 엔티티에서 Team 엔티티를 참조하는 외래 키
     private Team team;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    //멤버는Eager로 해야된다 그이유는 멤버조회할때 항상 MemberRole이 조회되어야 하기 때문이다.
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     private List<MemberRole> memberRoles;
+
+    @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
+    private List<JoinForm> joinForms;
 
 
 }

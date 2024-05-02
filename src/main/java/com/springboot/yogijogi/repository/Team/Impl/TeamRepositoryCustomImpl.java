@@ -1,6 +1,7 @@
 package com.springboot.yogijogi.repository.Team.Impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.springboot.yogijogi.entity.Member;
 import com.springboot.yogijogi.entity.QTeam;
 import com.springboot.yogijogi.entity.Team;
 import com.springboot.yogijogi.repository.Team.TeamRepositoryCustom;

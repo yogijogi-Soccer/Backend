@@ -18,7 +18,7 @@ import java.util.List;
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long team_id;
+    private Long teamId;
 
     @Column(nullable = false)
     private String team_name;
@@ -35,6 +35,10 @@ public class Team {
     @Column(nullable = false)
     private String town;
 
+    @Column(nullable = false)
+    private String play_ground;
+
+
     @ElementCollection(fetch = FetchType.LAZY)
     @Column(nullable = false)
     private List<String> activity_days;
@@ -45,7 +49,6 @@ public class Team {
 
     @Column(nullable = false)
     private String dues = "0";
-
     @Column(nullable = false)
     private String gender;
 
@@ -55,18 +58,20 @@ public class Team {
     @Column(nullable = true)
     private String inviteCode;
 
+    private String level;
+
 
 
 
     @ManyToOne
-    @JoinColumn(name = "manager_uid") // 매니저를 참조하는 외래 키
-    private Member manager; // 매니저 정보 추가
+    @JoinColumn(name = "member_uid") // 매니저를 참조하는 외래 키
+    private Member member; // 매니저 정보 추가
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private List<MemberRole> memberRoles;
 
-
-
+    @OneToMany(mappedBy = "team",fetch = FetchType.LAZY)
+    private List<JoinForm> joinForms;
 
 
 

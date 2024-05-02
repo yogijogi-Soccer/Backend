@@ -2,17 +2,19 @@ package com.springboot.yogijogi.service.Impl;
 
 import com.springboot.yogijogi.dto.*;
 import com.springboot.yogijogi.dto.Team.*;
+import com.springboot.yogijogi.entity.JoinForm;
 import com.springboot.yogijogi.entity.Member;
 
 import com.springboot.yogijogi.entity.MemberRole;
 import com.springboot.yogijogi.entity.Team;
 import com.springboot.yogijogi.jwt.JwtProvider;
 
+import com.springboot.yogijogi.repository.JoinFormRepository;
+import com.springboot.yogijogi.repository.MemberRoleRepository;
 import com.springboot.yogijogi.repository.Team.TeamRepository;
 import com.springboot.yogijogi.repository.MemberRepository;
 import com.springboot.yogijogi.service.TeamService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;;
 
@@ -30,9 +32,12 @@ public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
+    private final MemberRoleRepository memberRoleRepository;
+    private final JoinFormRepository joinFormRepository;
     private final JwtProvider jwtProvider;
 
     private Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
+
 
 
     private Member findUser(String token){
@@ -58,8 +63,11 @@ public class TeamServiceImpl implements TeamService {
             team.setTeam_name(teamProfileDto.getTeam_name());
             team.setTeam_introduce(teamProfileDto.getTeam_introduce());
             team.setTeam_image(teamProfileDto.getTeam_image());
-
             saveMemberRole(member,team,"Role_Manager");
+
+
+
+
 
 
             request.getSession().setAttribute("partialTeam",team);
@@ -86,9 +94,9 @@ public class TeamServiceImpl implements TeamService {
 
                 partialTeam.setRegion(teamMoreInfodDto1.getRegion());
                 partialTeam.setTown(teamMoreInfodDto1.getTown());
+                partialTeam.setPlay_ground(teamMoreInfodDto1.getPlay_ground());
                 partialTeam.setActivity_days(teamMoreInfodDto1.getActivity_days());
                 partialTeam.setActivity_time(teamMoreInfodDto1.getActivity_time());
-                partialTeam.setDues(teamMoreInfodDto1.getDues());
 
                 request.getSession().setAttribute("partialTeam",partialTeam);
                 setSuccess(teamResultDto);
@@ -115,15 +123,21 @@ public class TeamServiceImpl implements TeamService {
             }else{
                 partialTeam.setGender(teamMoreInfodDto2.getGender());
                 partialTeam.setAge(teamMoreInfodDto2.getAge());
+                partialTeam.setDues(teamMoreInfodDto2.getDues());
+                partialTeam.setLevel(teamMoreInfodDto2.getLevel());
                 partialTeam.setInviteCode(invite_code);
+
 
                 List<String>createTeam = member.getCreateTeam();
                 createTeam.add(partialTeam.getTeam_name());
-                member.setTeam(partialTeam);
 
                 List<String>joinTeams = member.getJoinTeam();
                 joinTeams.add(partialTeam.getTeam_name());
+
                 saveMemberRole(member,partialTeam,"ROLE_MANAGER");
+
+                member.setTeam(partialTeam);
+
 
                 teamRepository.save(partialTeam);
                 setSuccess(teamResultDto);
@@ -202,6 +216,64 @@ public class TeamServiceImpl implements TeamService {
         return teamResultDto;
     }
 
+    @Override
+    public TeamJoinSelectDto JoinUpSelectTeamInfo(HttpServletRequest request, String token, Long teamId) {
+        Team team = teamRepository.findByTeamId(teamId);
+        TeamJoinSelectDto teamJoinSelectDto = new TeamJoinSelectDto();
+
+        request.getSession().setAttribute("partialTeam",team);
+
+        if(team != null){
+            teamJoinSelectDto.setMember_num(getMemberCountByTeamId(teamId));
+            teamJoinSelectDto.setTeam_name(team.getTeam_name());
+            teamJoinSelectDto.setTeam_image(team.getTeam_image());
+            teamJoinSelectDto.setTeam_introduce(team.getTeam_introduce());
+            teamJoinSelectDto.setLevel(team.getLevel());
+            teamJoinSelectDto.setDues(team.getDues());
+            teamJoinSelectDto.setRegion(team.getRegion());
+            teamJoinSelectDto.setActivity_days(team.getActivity_days());
+            teamJoinSelectDto.setAge(team.getAge());
+            teamJoinSelectDto.setActivity_time(team.getActivity_time());
+            return teamJoinSelectDto;
+        }else {
+            // 팀이 존재하지 않는 경우 예외를 던집니다.
+            throw new IllegalArgumentException("팀이 존재하지 않습니다.");
+        }
+    }
+
+    @Override
+    public TeamJoinSelectMemberDto JoinUpSelectMemberInfo(HttpServletRequest request, String token) {
+        Member member = findUser(token);
+        request.getSession().setAttribute("partialMember",member);
+
+        if(member != null){
+            TeamJoinSelectMemberDto teamJoinSelectMemberDto = new TeamJoinSelectMemberDto();
+            teamJoinSelectMemberDto.setName(member.getName());
+            teamJoinSelectMemberDto.setBirth_date(member.getBirth_date());
+            teamJoinSelectMemberDto.setHas_experience(member.isHas_experience());
+            teamJoinSelectMemberDto.setAvailable_days(member.getAvailable_days());
+            teamJoinSelectMemberDto.setAvailable_time_start(member.getAvailable_time_start());
+            teamJoinSelectMemberDto.setAvailable_time_end(member.getAvailable_time_end());
+            return teamJoinSelectMemberDto;
+        }else {
+            // 팀이 존재하지 않는 경우 예외를 던집니다.
+            throw new IllegalArgumentException("회원이 존재하지 않습니다.");
+        }
+    }
+
+    @Override
+    public TeamResultDto JoinUp(HttpServletRequest request, String token, TeamJoinDto teamJoin) {
+        TeamResultDto teamResultDto =new TeamResultDto();
+
+        Team partialTeam = (Team) request.getSession().getAttribute("partialTeam");
+        Member partialMember = (Member) request.getSession().getAttribute("partialMember");
+
+        saveJoinForm(partialMember,partialTeam,teamJoin);
+
+
+        return teamResultDto;
+    }
+
     private void setSuccess(TeamResultDto teamResultDto){
         teamResultDto.setSuccess(true);
         teamResultDto.setCode(CommonResponse.SUCCESS.getCode());
@@ -222,6 +294,26 @@ public class TeamServiceImpl implements TeamService {
         memberRole.setTeam(team);
         memberRole.setRole(role);
         member.getMemberRoles().add(memberRole);
+        memberRoleRepository.save(memberRole);
     }
+
+    private void saveJoinForm(Member member, Team team, TeamJoinDto teamJoinDto) {
+        JoinForm joinForm = new JoinForm();
+        joinForm.setAdditional_info(teamJoinDto.getAdditional_info());
+        joinForm.setChecked(teamJoinDto.isChecked());
+        joinForm.setMember(member);
+        joinForm.setTeam(team);
+        joinFormRepository.save(joinForm);
+    }
+    public int getMemberCountByTeamId(Long teamId) {
+        Team team = teamRepository.findByTeamId(teamId);
+        if (team != null) {
+            List<MemberRole> memberRoles = team.getMemberRoles();
+            return memberRoles != null ? memberRoles.size() : 0;
+        } else {
+            throw new IllegalArgumentException("팀이 존재하지 않습니다.");
+        }
+    }
+
 
 }

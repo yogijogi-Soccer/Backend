@@ -17,10 +17,12 @@ public class TeamMoreInfodDto1 {
 
     private String town;
 
+    private String play_ground;
+
     private List<String> activity_days;
 
     private List<String> activity_time;
 
-    private String dues;
+
 
 }

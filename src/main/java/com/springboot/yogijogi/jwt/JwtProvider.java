@@ -89,7 +89,7 @@ public class JwtProvider {
     public String getUsername(String token){
         logger.info("[getUsername] 회원 구별 조회 시작");
 
-        String  info = Jwts.parser()
+        String info = Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody() // 토큰 본문
