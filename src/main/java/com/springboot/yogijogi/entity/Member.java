@@ -1,12 +1,17 @@
 package com.springboot.yogijogi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -131,6 +136,8 @@ public class Member implements UserDetails {
     private List<String> createTeam;
 
     @ManyToOne
+    @JsonIgnore
+    @BatchSize(size=1)
     @JoinColumn(name = "team_id") // Member 엔티티에서 Team 엔티티를 참조하는 외래 키
     private Team team;
 

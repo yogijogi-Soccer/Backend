@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -62,8 +63,8 @@ public class Team {
 
 
 
-
-    @ManyToOne
+    @BatchSize(size=1)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_uid") // 매니저를 참조하는 외래 키
     private Member member; // 매니저 정보 추가
 
@@ -72,6 +73,7 @@ public class Team {
 
     @OneToMany(mappedBy = "team",fetch = FetchType.LAZY)
     private List<JoinForm> joinForms;
+
 
 
 

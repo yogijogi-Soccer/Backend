@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         logger.info("[dofilterInternal] token 값 추출 완료. token : {} " , token);
 
         logger.info("[dofilterInternal] token 값 추출 체크 시작" );
+
         if(token!=null && jwtProvider.validToken(token)){
             Authentication authentication = jwtProvider.getAuthentication(token);
 

@@ -1,7 +1,7 @@
 package com.springboot.yogijogi.dto.Team;
 
 import lombok.*;
-@Data
+
 @Getter
 @Setter
 @AllArgsConstructor

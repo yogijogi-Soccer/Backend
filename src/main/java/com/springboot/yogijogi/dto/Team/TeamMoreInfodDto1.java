@@ -7,7 +7,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import java.util.List;
 
-@Data
+
 @Getter
 @Setter
 @NoArgsConstructor

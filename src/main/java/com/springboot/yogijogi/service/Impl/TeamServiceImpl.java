@@ -28,6 +28,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
