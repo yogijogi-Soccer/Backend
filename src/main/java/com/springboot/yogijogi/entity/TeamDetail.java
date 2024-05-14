@@ -16,7 +16,7 @@ import java.util.List;
 public class TeamDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long DetailTeamId;
+    private Long detailTeamId;
 
     private String address;
 
@@ -34,9 +34,11 @@ public class TeamDetail {
 
     private String tactics;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @Column(nullable = false)
-    List<String> todayPositions;
+    private String formationName;
+
+    @OneToOne
+    @JoinColumn(name = "pomation_id")
+    Pomation pomation;
 
     @OneToOne
     @JoinColumn(name = "team_id")

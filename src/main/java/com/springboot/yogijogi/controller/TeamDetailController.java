@@ -1,18 +1,14 @@
 package com.springboot.yogijogi.controller;
 
-import com.springboot.yogijogi.dto.Team.TeamPlayScheduleDto;
-import com.springboot.yogijogi.dto.Team.TeamProfileDto;
-import com.springboot.yogijogi.dto.Team.TeamResultDto;
+import com.springboot.yogijogi.dto.Team.*;
+import com.springboot.yogijogi.entity.JoinForm;
 import com.springboot.yogijogi.service.TeamDetailService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,8 +25,8 @@ public class TeamDetailController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
     })
     public ResponseEntity<TeamResultDto> TeamPlayRegistration(HttpServletRequest request,
-                                                    @RequestBody TeamPlayScheduleDto teamPlayScheduleDto) {
-        TeamResultDto teamResultDto = teamDetailService.TeamPlayRegistration(request,request.getHeader("X-AUTH-TOKEN"), teamPlayScheduleDto);
+                                                              @RequestBody TeamPlayScheduleDto teamPlayScheduleDto,@RequestParam String formation_name) {
+        TeamResultDto teamResultDto = teamDetailService.TeamPlayRegistration(request, request.getHeader("X-AUTH-TOKEN"), teamPlayScheduleDto,formation_name);
         if (teamResultDto.isSuccess()) {
             return new ResponseEntity<>(teamResultDto, HttpStatus.OK);
         } else {
@@ -38,5 +34,37 @@ public class TeamDetailController {
         }
     }
 
+    @GetMapping("/play-schedule")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamPlayScheduleDto> TeamPlaySchedule(HttpServletRequest request,
+                                                                @RequestParam Long id) {
+        TeamPlayScheduleDto scheduleDto = teamDetailService.TeamPlaySchedule(request, request.getHeader("X-AUTH-TOKEN"),id);
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+
+
+    }
+
+    @GetMapping("/join-player-select")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamDetailJoinDto> TeamPlayJoinFormSelect(HttpServletRequest request,
+                                                                    @RequestParam Long id) {
+        TeamDetailJoinDto teamDetailJoinDto = teamDetailService.TeamPlayJoinFormSelect(request, request.getHeader("X-AUTH-TOKEN"),id);
+        return ResponseEntity.status(HttpStatus.OK).body(teamDetailJoinDto);
+
+    }
+
+    @GetMapping("/pomation-select")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<TeamPomatinDto> TeamPlayJoinFormSelect(HttpServletRequest request, String token,@RequestParam String position_name) {
+        TeamPomatinDto teamPomatinDto = teamDetailService.TeamPomationSelectTest(request,token,position_name);
+        return ResponseEntity.status(HttpStatus.OK).body(teamPomatinDto);
+
+    }
 
 }
