@@ -1,5 +1,6 @@
 package com.springboot.yogijogi.repository.Team;
 
+import com.springboot.yogijogi.entity.Member;
 import com.springboot.yogijogi.entity.Team;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -9,5 +10,6 @@ public interface TeamRepository extends JpaRepository<Team,Long>,TeamRepositoryC
 
     Team findByInviteCode(String inviteCode);
     Team findByTeamId(Long teamId);
+
 
 }

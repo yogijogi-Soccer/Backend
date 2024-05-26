@@ -14,4 +14,5 @@ public interface TeamService {
     TeamJoinSelectMemberDto JoinUpSelectMemberInfo(HttpServletRequest request,String token);
     TeamResultDto JoinUp(HttpServletRequest request, String token, TeamJoinDto teamJoinDto);
 
+
 }

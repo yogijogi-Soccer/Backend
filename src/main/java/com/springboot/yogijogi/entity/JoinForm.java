@@ -19,17 +19,17 @@ public class JoinForm {
     private String joinStatus = "대기중";  // 가입 상태
 
     @Column(nullable = false)
-    private String Additional_info; // 추가 전달 사항
+    private String additional_info; // 추가 전달 사항
 
     @Column(nullable = false)
     private boolean  checked  = false; // 추가 전달 사항
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_uid")
     private Member member;
 }

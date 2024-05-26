@@ -20,6 +20,6 @@ public class Pomation {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Column(nullable = true)
-    private List<String> position_detail;
+    private List<String> formation_detail;
 
 }

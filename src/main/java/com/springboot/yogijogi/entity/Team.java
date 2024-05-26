@@ -69,11 +69,12 @@ public class Team {
     private Member member; // 매니저 정보 추가
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    @BatchSize(size=10) // 예시로 설정한 값. 실제 적용에 맞게 변경
     private List<MemberRole> memberRoles;
 
-    @OneToMany(mappedBy = "team",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    @BatchSize(size=10) // 예시로 설정한 값. 실제 적용에 맞게 변경
     private List<JoinForm> joinForms;
-
 
 
 

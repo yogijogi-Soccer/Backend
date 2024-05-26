@@ -91,6 +91,7 @@ public class Member implements UserDetails {
     boolean marketing_personal_information;
 
     @Override
+    @Transactional
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.memberRoles.stream()
                 .map(memberRole -> new SimpleGrantedAuthority(memberRole.getRole()))
@@ -135,14 +136,14 @@ public class Member implements UserDetails {
     @ElementCollection(fetch = FetchType.LAZY)
     private List<String> createTeam;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @BatchSize(size=1)
     @JoinColumn(name = "team_id") // Member 엔티티에서 Team 엔티티를 참조하는 외래 키
     private Team team;
 
     //멤버는Eager로 해야된다 그이유는 멤버조회할때 항상 MemberRole이 조회되어야 하기 때문이다.
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<MemberRole> memberRoles;
 
     @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)

@@ -8,6 +8,7 @@ import com.springboot.yogijogi.service.Impl.TeamServiceImpl;
 import com.springboot.yogijogi.service.TeamService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,20 +21,15 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/team-api")
+@RequiredArgsConstructor
 public class TeamController {
 
     private final TeamService teamService;
 
-    private final MemberRepository memberRepository;
-    private final JwtProvider jwtProvider;
+
 
     private Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
-    @Autowired
-    private TeamController (TeamService teamService, JwtProvider jwtProvider, MemberRepository memberRepository){
-        this.teamService = teamService;
-        this.jwtProvider = jwtProvider;
-        this.memberRepository = memberRepository;
-    }
+
 
     @PostMapping("/create")
     @ApiImplicitParams({

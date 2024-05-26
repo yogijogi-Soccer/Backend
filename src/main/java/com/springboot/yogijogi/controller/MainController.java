@@ -4,6 +4,7 @@ import com.springboot.yogijogi.dto.Team.TeamNameSearchDto;
 import com.springboot.yogijogi.dto.Team.TeamProfileDto;
 import com.springboot.yogijogi.entity.Team;
 import com.springboot.yogijogi.service.MainPageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +17,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/main-api")
+@RequiredArgsConstructor
 public class MainController {
     private final MainPageService mainPageService;
 
-    @Autowired
-    public MainController(MainPageService mainPageService){
 
-        this.mainPageService = mainPageService;
-    }
 
     @GetMapping("/search-team-name")
     public ResponseEntity<List<TeamNameSearchDto>>searchTeamName(String team_name){

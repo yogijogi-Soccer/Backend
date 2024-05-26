@@ -36,11 +36,15 @@ public class TeamDetail {
 
     private String formationName;
 
-    @OneToOne
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Column(nullable = true)
+    private List<String> formation_player;
+
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pomation_id")
     Pomation pomation;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     Team team;
 

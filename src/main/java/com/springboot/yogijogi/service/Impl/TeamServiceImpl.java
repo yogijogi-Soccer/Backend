@@ -9,12 +9,13 @@ import com.springboot.yogijogi.entity.MemberRole;
 import com.springboot.yogijogi.entity.Team;
 import com.springboot.yogijogi.jwt.JwtProvider;
 
-import com.springboot.yogijogi.repository.JoinFormRepository;
+import com.springboot.yogijogi.repository.JoinForm.JoinFormRepository;
 import com.springboot.yogijogi.repository.MemberRoleRepository;
 import com.springboot.yogijogi.repository.Team.TeamRepository;
 import com.springboot.yogijogi.repository.MemberRepository;
 import com.springboot.yogijogi.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;;
 
@@ -41,11 +42,13 @@ public class TeamServiceImpl implements TeamService {
 
 
 
-    private Member findUser(String token){
+    @Transactional
+    public Member findUser(String token){
         logger.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
         String info = jwtProvider.getUsername(token);
         Member member = memberRepository.findByPhoneNum(info);
-
+        // LazyInitializationException 방지를 위해 memberRoles를 초기화합니다.
+        Hibernate.initialize(member.getMemberRoles());
         logger.info("[getUsername] 토큰 기반 회원 구별 정보 추출 완료 info: {} " ,info);
         return member;
     }
@@ -65,10 +68,6 @@ public class TeamServiceImpl implements TeamService {
             team.setTeam_introduce(teamProfileDto.getTeam_introduce());
             team.setTeam_image(teamProfileDto.getTeam_image());
             saveMemberRole(member,team,"Role_Manager");
-
-
-
-
 
 
             request.getSession().setAttribute("partialTeam",team);

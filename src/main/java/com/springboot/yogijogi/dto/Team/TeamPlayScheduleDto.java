@@ -29,5 +29,9 @@ public class TeamPlayScheduleDto {
 
     private String tactics;
 
+    private List<String> formation_player;
+
+
+
 
 }

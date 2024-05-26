@@ -26,8 +26,6 @@ public class MemberRole {
     @JoinColumn(name = "team_id")
     private Team team;
 
-
-
     @Column(nullable = false)
     private String role;
 }
