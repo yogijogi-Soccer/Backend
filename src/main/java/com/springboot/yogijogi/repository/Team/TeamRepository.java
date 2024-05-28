@@ -12,4 +12,5 @@ public interface TeamRepository extends JpaRepository<Team,Long>,TeamRepositoryC
     Team findByTeamId(Long teamId);
 
 
+
 }

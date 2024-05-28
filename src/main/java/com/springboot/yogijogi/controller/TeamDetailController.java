@@ -1,6 +1,10 @@
 package com.springboot.yogijogi.controller;
 
+import com.springboot.yogijogi.dto.Announcement.AnnouncementDetailDto;
+import com.springboot.yogijogi.dto.Announcement.AnnouncementDto;
+import com.springboot.yogijogi.dto.Announcement.AnnouncementSelectDto;
 import com.springboot.yogijogi.dto.Team.*;
+import com.springboot.yogijogi.service.AnnouncementService;
 import com.springboot.yogijogi.service.TeamDetailService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -18,6 +22,7 @@ import java.util.List;
 public class TeamDetailController {
 
     private final TeamDetailService teamDetailService;
+    private final AnnouncementService announcementService;
 
 
     @PostMapping("/play-registration")
@@ -74,6 +79,53 @@ public class TeamDetailController {
         TeamResultDto teamResultDto = teamDetailService.JoinFormApprove(request ,teamDetailJoinApproveDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(teamResultDto);
+
+    }
+
+
+
+    @PostMapping("/annoncement-save")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<AnnouncementDto> saveAnnouncement(HttpServletRequest request, @RequestBody AnnouncementDto announcementDto) {
+        AnnouncementDto savedAnnouncement = announcementService.saveAnnouncement(request, announcementDto);
+        return ResponseEntity.status(HttpStatus.OK).body(savedAnnouncement);
+    }
+
+    @PutMapping("/annoncement-update/{id}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<AnnouncementDto> updateAnnouncement(HttpServletRequest request, @PathVariable Long id, @RequestBody AnnouncementDto announcementDto) {
+        AnnouncementDto updatedAnnouncement = announcementService.updateAnnouncement(request, id, announcementDto);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedAnnouncement);
+    }
+
+    @DeleteMapping("/annoncement-delete/{id}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<Void> deleteAnnouncement(HttpServletRequest request, @PathVariable Long id) {
+        announcementService.deleteAnnouncement(request, id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    @GetMapping("/annoncement-select")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<List<AnnouncementSelectDto>> SelectAnnouncement(HttpServletRequest request, @RequestParam Long id) {
+        List<AnnouncementSelectDto> announcementSelectDto = announcementService.selectAnnouncementList(request,id);
+        return ResponseEntity.status(HttpStatus.OK).body(announcementSelectDto);
+
+    }
+    @GetMapping("/annoncement-detail-select")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
+    })
+    public ResponseEntity<AnnouncementDetailDto> selectAnnouncementDetail(HttpServletRequest request, @RequestParam Long teamId, Long announcementId ) {
+        AnnouncementDetailDto announcementDetailDto = announcementService.selectAnnouncementDetail(request,teamId,announcementId);
+        return ResponseEntity.status(HttpStatus.OK).body(announcementDetailDto);
 
     }
 

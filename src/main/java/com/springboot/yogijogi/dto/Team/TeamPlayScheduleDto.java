@@ -2,9 +2,7 @@ package com.springboot.yogijogi.dto.Team;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
+
 import java.util.List;
 
 
