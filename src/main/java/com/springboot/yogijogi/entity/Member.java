@@ -149,5 +149,9 @@ public class Member implements UserDetails {
     @OneToMany(mappedBy = "member",fetch = FetchType.LAZY)
     private List<JoinForm> joinForms;
 
+    public List<MemberRole> getMemberRolesWithInit() {
+        Hibernate.initialize(memberRoles);
+        return memberRoles;
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.springboot.yogijogi.dto.Team;
+package com.springboot.yogijogi.dto.Team.Join;
 
 import lombok.*;
 

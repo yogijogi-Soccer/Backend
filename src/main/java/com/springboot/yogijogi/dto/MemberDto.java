@@ -3,6 +3,7 @@ package com.springboot.yogijogi.dto;
 import com.springboot.yogijogi.entity.MemberRole;
 import lombok.*;
 
+import javax.persistence.Column;
 import java.util.List;
 
 @Getter
@@ -11,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class MemberDto {
+    private Long uid;
     private String phone_num;
-    private MemberRole memberRole;
+    private String name;
+    private List<String> memberRole;
 }

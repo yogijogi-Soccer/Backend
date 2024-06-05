@@ -1,8 +1,6 @@
 package com.springboot.yogijogi.service;
 
-import com.springboot.yogijogi.dto.Team.TeamNameSearchDto;
-import com.springboot.yogijogi.entity.Team;
-import org.springframework.data.domain.Page;
+import com.springboot.yogijogi.dto.Team.Search.TeamNameSearchDto;
 
 import java.util.List;
 

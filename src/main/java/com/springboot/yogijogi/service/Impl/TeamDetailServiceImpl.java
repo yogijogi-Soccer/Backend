@@ -3,6 +3,9 @@ package com.springboot.yogijogi.service.Impl;
 import com.springboot.yogijogi.dto.CommonResponse;
 
 import com.springboot.yogijogi.dto.Team.*;
+
+import com.springboot.yogijogi.dto.Team.Join.TeamDetailJoinApproveDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamDetailJoinDto;
 import com.springboot.yogijogi.entity.*;
 import com.springboot.yogijogi.jwt.JwtProvider;
 import com.springboot.yogijogi.repository.JoinForm.JoinFormRepository;
@@ -119,7 +122,6 @@ public class TeamDetailServiceImpl implements TeamDetailService {
 
 
     @Override
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Transactional
     public List<TeamDetailJoinDto> TeamPlayJoinFormSelect(HttpServletRequest request, String token, Long teamId) {
         Member adminMember = findUser(token);
@@ -145,7 +147,6 @@ public class TeamDetailServiceImpl implements TeamDetailService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public TeamResultDto JoinFormApprove(HttpServletRequest request, TeamDetailJoinApproveDto teamDetailJoinApproveDto) {
         Member adminMember = findUser(request.getHeader("X-AUTH-TOKEN"));
         TeamResultDto teamResultDto = new TeamResultDto();
@@ -176,6 +177,8 @@ public class TeamDetailServiceImpl implements TeamDetailService {
         }
         return teamResultDto;
     }
+
+
 
     @Override
     public TeamPomatinDto TeamPomationSelectTest(HttpServletRequest request, String token, String position_name) {

@@ -1,15 +1,12 @@
 package com.springboot.yogijogi.service.Impl;
 
-import com.springboot.yogijogi.dto.Team.TeamNameSearchDto;
+import com.springboot.yogijogi.dto.Team.Search.TeamNameSearchDto;
 import com.springboot.yogijogi.entity.Team;
 import com.springboot.yogijogi.repository.Team.TeamRepository;
 import com.springboot.yogijogi.service.MainPageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +41,7 @@ public class MainPageServiceImpl implements MainPageService {
             teamNameSearchDto.setGender(team.getGender());
             teamNameSearchDto.setRegion(team.getRegion());
             teamNameSearchDto.setTown(team.getTown());
+            teamNameSearchDto.setTeam_imageUrl(team.getTeam_imageUrl());
             return teamNameSearchDto;
         }).collect(Collectors.toList());
     }
@@ -64,6 +62,7 @@ public class MainPageServiceImpl implements MainPageService {
             teamNameSearchDto.setGender(team.getGender());
             teamNameSearchDto.setRegion(team.getRegion());
             teamNameSearchDto.setTown(team.getTown());
+            teamNameSearchDto.setTeam_imageUrl(team.getTeam_imageUrl());
             return teamNameSearchDto;
         }).collect(Collectors.toList());
     }
@@ -84,6 +83,7 @@ public class MainPageServiceImpl implements MainPageService {
             teamNameSearchDto.setGender(team.getGender());
             teamNameSearchDto.setRegion(team.getRegion());
             teamNameSearchDto.setTown(team.getTown());
+            teamNameSearchDto.setTeam_imageUrl(team.getTeam_imageUrl());
             return teamNameSearchDto;
         }).collect(Collectors.toList());
     }
@@ -104,6 +104,7 @@ public class MainPageServiceImpl implements MainPageService {
             teamNameSearchDto.setGender(team.getGender());
             teamNameSearchDto.setRegion(team.getRegion());
             teamNameSearchDto.setTown(team.getTown());
+            teamNameSearchDto.setTeam_imageUrl(team.getTeam_imageUrl());
             return teamNameSearchDto;
         }).collect(Collectors.toList());
     }
@@ -124,6 +125,7 @@ public class MainPageServiceImpl implements MainPageService {
             teamNameSearchDto.setGender(team.getGender());
             teamNameSearchDto.setRegion(team.getRegion());
             teamNameSearchDto.setTown(team.getTown());
+            teamNameSearchDto.setTeam_imageUrl(team.getTeam_imageUrl());
             return teamNameSearchDto;
         }).collect(Collectors.toList());
     }

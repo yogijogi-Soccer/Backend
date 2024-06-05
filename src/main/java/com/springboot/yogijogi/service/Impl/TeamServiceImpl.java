@@ -2,6 +2,10 @@ package com.springboot.yogijogi.service.Impl;
 
 import com.springboot.yogijogi.dto.*;
 import com.springboot.yogijogi.dto.Team.*;
+import com.springboot.yogijogi.dto.Team.Join.TeamInviteCodeDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamJoinDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamJoinSelectDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamJoinSelectMemberDto;
 import com.springboot.yogijogi.entity.JoinForm;
 import com.springboot.yogijogi.entity.Member;
 
@@ -13,6 +17,7 @@ import com.springboot.yogijogi.repository.JoinForm.JoinFormRepository;
 import com.springboot.yogijogi.repository.MemberRoleRepository;
 import com.springboot.yogijogi.repository.Team.TeamRepository;
 import com.springboot.yogijogi.repository.MemberRepository;
+import com.springboot.yogijogi.service.S3.S3Uploader;
 import com.springboot.yogijogi.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
@@ -21,8 +26,10 @@ import org.slf4j.LoggerFactory;;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -37,45 +44,60 @@ public class TeamServiceImpl implements TeamService {
     private final MemberRoleRepository memberRoleRepository;
     private final JoinFormRepository joinFormRepository;
     private final JwtProvider jwtProvider;
+    private final S3Uploader s3Uploader;
 
     private Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
 
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Member findUser(String token){
         logger.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
         String info = jwtProvider.getUsername(token);
         Member member = memberRepository.findByPhoneNum(info);
+
         // LazyInitializationException 방지를 위해 memberRoles를 초기화합니다.
-        Hibernate.initialize(member.getMemberRoles());
+        if (member != null) {
+            Hibernate.initialize(member.getMemberRoles());
+
+        }
         logger.info("[getUsername] 토큰 기반 회원 구별 정보 추출 완료 info: {} " ,info);
         return member;
     }
 
 
     @Override
-    public TeamResultDto createTeam(HttpServletRequest request, String token, TeamProfileDto teamProfileDto) {
+    public TeamResultDto createTeam(HttpServletRequest request, String token, MultipartFile team_image, String team_Introduce, String team_name) {
         Member member = findUser(token);
 
         TeamResultDto teamResultDto = new TeamResultDto();
-        if(member == null){
+        if (member == null) {
             setFail(teamResultDto);
-        }else{
-
+        } else {
             Team team = new Team();
-            team.setTeam_name(teamProfileDto.getTeam_name());
-            team.setTeam_introduce(teamProfileDto.getTeam_introduce());
-            team.setTeam_image(teamProfileDto.getTeam_image());
-            saveMemberRole(member,team,"Role_Manager");
+            team.setTeam_name(team_name);
+            team.setTeam_introduce(team_Introduce);
+
+            try {
+                // MultipartFile을 S3에 업로드하고 경로를 설정
+                String imageUrl = s3Uploader.uploadImage(team_image, "image");
+                team.setTeam_imageUrl(imageUrl); // team_imageUrl에 이미지 URL 설정
+            } catch (IOException e) {
+                // 이미지 업로드 실패 처리
+                e.printStackTrace();
+                setFail(teamResultDto);
+                return teamResultDto;
+            }
+            request.getSession().setAttribute("partialTeam", team);
 
 
-            request.getSession().setAttribute("partialTeam",team);
+
 
             setSuccess(teamResultDto);
         }
         return teamResultDto;
     }
+
 
     @Override
     public TeamResultDto TeamMoreInfo1(HttpServletRequest request, String token, TeamMoreInfodDto1 teamMoreInfodDto1) {
@@ -165,7 +187,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public TeamInviteCodeDto SelectTeamByInviteCode(HttpServletRequest request,String token,String invite_code) {
+    public TeamInviteCodeDto SelectTeamByInviteCode(HttpServletRequest request, String token, String invite_code) {
         // 초대 코드에 해당하는 팀을 데이터베이스에서 검색
         Team team = teamRepository.findByInviteCode(invite_code);
 
@@ -176,7 +198,7 @@ public class TeamServiceImpl implements TeamService {
                 TeamInviteCodeDto teamInviteCodeDto = new TeamInviteCodeDto();
                 teamInviteCodeDto.setInvite_code(invite_code);
                 teamInviteCodeDto.setTeam_name(team.getTeam_name());
-                teamInviteCodeDto.setTeam_image(team.getTeam_image());
+                teamInviteCodeDto.setTeam_image(team.getTeam_imageUrl());
                 logger.info("[teamInviteCodeDto] : {} ", teamInviteCodeDto);
 
                 request.getSession().setAttribute("partialTeam",team);
@@ -226,7 +248,7 @@ public class TeamServiceImpl implements TeamService {
         if(team != null){
             teamJoinSelectDto.setMember_num(getMemberCountByTeamId(teamId));
             teamJoinSelectDto.setTeam_name(team.getTeam_name());
-            teamJoinSelectDto.setTeam_image(team.getTeam_image());
+            teamJoinSelectDto.setTeam_image(team.getTeam_imageUrl());
             teamJoinSelectDto.setTeam_introduce(team.getTeam_introduce());
             teamJoinSelectDto.setLevel(team.getLevel());
             teamJoinSelectDto.setDues(team.getDues());

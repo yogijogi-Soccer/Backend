@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,9 +28,11 @@ public class Team {
     @Column(nullable = false)
     private String team_introduce;
 
-    @Column(nullable = true)
-    private String team_image;
+    @Transient // 데이터베이스에 저장하지 않음
+    private MultipartFile team_image; // 이미지 파일을 업로드하기 위한 필드
 
+    @Column(nullable = true)
+    private String team_imageUrl; // 이미지 파일의 경로를 저장하는 필드
     @Column(nullable = false)
     private String region;
 

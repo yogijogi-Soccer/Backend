@@ -39,7 +39,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (member == null) {
             throw new UsernameNotFoundException("User not found with phone number: " + phoneNum);
         }
-
+        member.getMemberRolesWithInit();
         return member;
     }
 }

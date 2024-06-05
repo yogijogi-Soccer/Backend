@@ -4,6 +4,9 @@ import com.springboot.yogijogi.dto.Announcement.AnnouncementDetailDto;
 import com.springboot.yogijogi.dto.Announcement.AnnouncementDto;
 import com.springboot.yogijogi.dto.Announcement.AnnouncementSelectDto;
 import com.springboot.yogijogi.dto.Team.*;
+
+import com.springboot.yogijogi.dto.Team.Join.TeamDetailJoinApproveDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamDetailJoinDto;
 import com.springboot.yogijogi.service.AnnouncementService;
 import com.springboot.yogijogi.service.TeamDetailService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -56,7 +59,7 @@ public class TeamDetailController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
     })
     public ResponseEntity<List<TeamDetailJoinDto>> TeamPlayJoinFormSelect(HttpServletRequest request,
-                                                                    @RequestParam Long id) {
+                                                                          @RequestParam Long id) {
         List<TeamDetailJoinDto> teamDetailJoinDto = teamDetailService.TeamPlayJoinFormSelect(request, request.getHeader("X-AUTH-TOKEN"),id);
         return ResponseEntity.status(HttpStatus.OK).body(teamDetailJoinDto);
 
@@ -128,6 +131,5 @@ public class TeamDetailController {
         return ResponseEntity.status(HttpStatus.OK).body(announcementDetailDto);
 
     }
-
 
 }

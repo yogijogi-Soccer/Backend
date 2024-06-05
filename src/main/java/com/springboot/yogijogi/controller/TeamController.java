@@ -1,9 +1,10 @@
 package com.springboot.yogijogi.controller;
 
 import com.springboot.yogijogi.dto.Team.*;
-import com.springboot.yogijogi.entity.Member;
-import com.springboot.yogijogi.jwt.JwtProvider;
-import com.springboot.yogijogi.repository.MemberRepository;
+import com.springboot.yogijogi.dto.Team.Join.TeamInviteCodeDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamJoinDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamJoinSelectDto;
+import com.springboot.yogijogi.dto.Team.Join.TeamJoinSelectMemberDto;
 import com.springboot.yogijogi.service.Impl.TeamServiceImpl;
 import com.springboot.yogijogi.service.TeamService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -11,11 +12,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,20 +31,21 @@ public class TeamController {
     private Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
 
 
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = "multipart/form-data")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
     })
     public ResponseEntity<TeamResultDto> createTeam(HttpServletRequest request,
-                                                    @RequestBody TeamProfileDto teamProfileDto) {
-        TeamResultDto teamResultDto = teamService.createTeam(request,request.getHeader("X-AUTH-TOKEN"), teamProfileDto);
+                                                    @RequestPart("image") MultipartFile team_image,
+                                                    @RequestPart("team_introduce") String team_Introduce,
+                                                    @RequestPart("team_name") String team_name) {
+    TeamResultDto teamResultDto = teamService.createTeam(request, request.getHeader("X-AUTH-TOKEN"), team_image, team_Introduce,team_name);
         if (teamResultDto.isSuccess()) {
             return new ResponseEntity<>(teamResultDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(teamResultDto, HttpStatus.BAD_REQUEST);
         }
     }
-
     @PostMapping("/teamMoreInfo1")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
@@ -78,7 +79,7 @@ public class TeamController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "사용자 인증 Token", required = true, dataType = "String", paramType = "header")
     })
     public ResponseEntity<TeamInviteCodeDto> SelectTeamByInviteCode(HttpServletRequest request,
-                                                       @RequestParam String invite_code) {
+                                                                    @RequestParam String invite_code) {
         TeamInviteCodeDto teamInviteCodeDto = teamService.SelectTeamByInviteCode(request,request.getHeader("X-AUTH-TOKEN"), invite_code);
         return ResponseEntity.status(HttpStatus.OK).body(teamInviteCodeDto);
     }

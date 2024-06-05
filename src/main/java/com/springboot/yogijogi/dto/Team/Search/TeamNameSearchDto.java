@@ -1,4 +1,4 @@
-package com.springboot.yogijogi.dto.Team;
+package com.springboot.yogijogi.dto.Team.Search;
 
 import lombok.*;
 
@@ -17,4 +17,5 @@ public class TeamNameSearchDto {
     private String gender;
     private String region;
     private String town;
+    private String team_imageUrl;
 }
